@@ -1,4 +1,4 @@
-import IActors, {FirestoreActorModel} from '../../@types/actors';
+import {FirestoreActorModel} from '../../@types/actors';
 import IFilms, {FirestoreFilmModel} from '../../@types/films';
 import {CollectionReference, DocumentData, Firestore, QueryDocumentSnapshot} from '@google-cloud/firestore';
 import IDatastoreConnection from '../../@types/datastoreConnection';
@@ -7,7 +7,6 @@ import {FirestoreConnectionOptions} from '../../@types/config';
 import {FirestoreQuoteModel} from '../../@types/quote';
 
 export default class FirestoreConnection implements IDatastoreConnection {
-  private readonly _actors: IActors;
   private readonly _films: IFilms;
   private readonly _firestore: Firestore;
   private readonly _filmsRef: CollectionReference<FirestoreFilmModel>;
@@ -48,10 +47,6 @@ export default class FirestoreConnection implements IDatastoreConnection {
         }
       });
     this._films = new FirestoreFilms(this._firestore, this._filmsRef, this._actorsRef);
-  }
-
-  get actors(): IActors {
-    return this._actors;
   }
 
   get films(): IFilms {

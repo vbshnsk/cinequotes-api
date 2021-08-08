@@ -55,7 +55,12 @@ const plugin = async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
           id: updated.id,
           title: updated.title
         },
-        quotes: updated.quotes
+        quotes: updated.quotes.map(v => {
+          return {
+            id: v.id,
+            text: v.text
+          };
+        })
       });
     });
 
