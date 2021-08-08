@@ -61,14 +61,19 @@ export default class FirestoreConnection implements IDatastoreConnection {
     return Promise.resolve();
   }
 
-  insertAt(path: string, data: unknown) {
-    return this._firestore.collection(path).add(data);
+  insertAt(path: string, id: string, data: unknown) {
+    return this._firestore.collection(path).doc(id).set(data);
+  }
+
+  async flush() {
+    const cols = await this._firestore.listCollections();
+    return Promise.all(cols.map(v => this._firestore.recursiveDelete(v)));
   }
 
   _isValidFilmModel(v): v is FirestoreFilmModel {
     return typeof v.title === 'string' &&
       typeof v.id === 'string' &&
-      this._isValidQuoteModel(v);
+      (Array.isArray(v.quotes) && v.quotes.every(q =>this._isValidQuoteModel(q)));
   }
 
   _isValidQuoteModel(v): v is FirestoreQuoteModel {

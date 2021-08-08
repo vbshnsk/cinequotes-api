@@ -2,7 +2,7 @@ import IFilms, {Film, FirestoreFilmModel} from '../../@types/films';
 import {CollectionReference, Firestore} from '@google-cloud/firestore';
 import Quote, {FirestoreQuoteModel} from '../../@types/quote';
 import {FirestoreActorModel} from '../../@types/actors';
-import uuid from 'uuid';
+import * as uuid from 'uuid';
 
 export default class FirestoreFilms implements IFilms {
   private _filmsRef: CollectionReference<FirestoreFilmModel>;
@@ -43,7 +43,8 @@ export default class FirestoreFilms implements IFilms {
   }
 
   async getQuoteMetadataById(filmId: string, quoteId: string): Promise<Quote> {
-    const {quotes} = (await this._filmsRef.doc(filmId).get()).data() || {quotes: []};
+    const res = await this._filmsRef.doc(filmId).get();
+    const {quotes} = res.exists ? res.data() : {quotes: []};
     const quote = quotes.find(v => v.id === quoteId);
     if (quote) {
       const actor = (await this._actorsRef.doc(quote.actorRef).get()).data();
@@ -60,7 +61,9 @@ export default class FirestoreFilms implements IFilms {
     const [actor] = (await this._actorsRef.where('name', '==', actorName).get()).docs;
     let actorId: string;
     if (!actor) {
-      actorId = (await this._actorsRef.add({name: actorName})).id;
+      const id = uuid.v4();
+      await this._actorsRef.doc(id).set({name: actorName});
+      actorId = id;
     }
     else {
       actorId = actor.data().id;
@@ -70,22 +73,33 @@ export default class FirestoreFilms implements IFilms {
       text: quoteText,
       actorRef: actorId
     };
-    const film = (await this._firestore.runTransaction(async transaction => {
+    let filmId;
+    let filmSnap = (await this._firestore.runTransaction(async transaction => {
       const [film] = (await transaction.get(this._filmsRef.where('title', '==', title))).docs;
       if (film) {
         const quotes = [...film.data().quotes, quote];
-        transaction.update(this._filmsRef.doc(film.data().id), {quotes});
+        filmId = film.data().id;
+        transaction.update(this._filmsRef.doc(filmId), {quotes});
       }
       else {
-        transaction.set(this._filmsRef.doc(), {
+        filmId = uuid.v4();
+        transaction.set(this._filmsRef.doc(filmId), {
           title,
           quotes: [quote]
         });
       }
       return film;
-    })).data();
-    delete quote.actorRef;
-    film.quotes.push(quote);
+    }));
+    let film: FirestoreFilmModel;
+    if (!filmSnap) {
+      [filmSnap] = (await this._filmsRef.where('title', '==', title).get()).docs;
+      film = filmSnap.data();
+    }
+    else {
+      film = filmSnap.data();
+      film.quotes.push(quote);
+    }
+
     return film;
   }
 

@@ -10,7 +10,6 @@ const plugin = async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
         Params: Pick<FilmRouteBaseParams, 'quoteId'>,
         Reply: ErrorReply
       }>('preHandler', async (req, rep) => {
-        console.log(req.params);
         if (!fastify.validator.isUUID(req.params.quoteId)) {
           rep.code(400);
           rep.send({
