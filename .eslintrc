@@ -11,7 +11,7 @@
       // Enforcing
       "indent": [
         "error",
-        4,
+        2,
         {"SwitchCase": 1}
       ],
       "linebreak-style": ["off"],
@@ -19,10 +19,10 @@
         "error",
         "single"
       ],
-      "semi": [
-        "error",
-        "always"
-      ],
+      "semi": "off",
+      "@typescript-eslint/semi": ["error"],
+      "no-extra-semi": "off",
+      "@typescript-eslint/no-extra-semi": ["error"],
       "no-bitwise": ["error"],
       "camelcase": ["off"],
       "eqeqeq": ["error"],
@@ -34,12 +34,12 @@
       "no-undef": ["error"],
       "no-unused-vars": ["off"],
       "max-len": ["error", 120],
-      "no-var": ["on"],
+      "no-var": 1,
       "@typescript-eslint/no-empty-interface": ["off"],
       "@typescript-eslint/no-unused-vars": ["off"],
       "@typescript-eslint/explicit-module-boundary-types": ["off"],
       "no-case-declarations": "off",
-      "@typescript-eslint/no-explicit-any": ["off"]
+      "@typescript-eslint/no-explicit-any": ["error"]
     },
     "plugins": [
       "jest",
