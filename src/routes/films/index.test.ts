@@ -1,5 +1,5 @@
 import {FastifyInstance} from 'fastify';
-import {start} from '../../server';
+import {start, startForTests} from '../../server';
 import * as sinon from 'sinon';
 import {SinonSandbox, SinonStub} from 'sinon';
 
@@ -9,7 +9,7 @@ describe('/films', () => {
   let sandbox: SinonSandbox;
 
   beforeAll(async () => {
-    server = await start();
+    server = await startForTests();
     sandbox = sinon.createSandbox();
   });
 
@@ -22,6 +22,8 @@ describe('/films', () => {
   beforeEach(() => {
     validationStub = sandbox.stub(server.validator, 'isUUID')
       .returns(true);
+    sandbox.stub(server.translationClient, 'start')
+      .resolves();
   });
 
   describe('/:filmId', () => {
@@ -71,6 +73,8 @@ describe('/films', () => {
   describe('PUT: /', () => {
 
     it('should update quotes for a movie', async () => {
+      sandbox.stub(server.translationClient, 'requestTranslation')
+        .resolves();
       sandbox.stub(server.store.films, 'addQuote')
         .resolves({
           id: 'id',

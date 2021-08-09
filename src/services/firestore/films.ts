@@ -29,12 +29,13 @@ export default class FirestoreFilms implements IFilms {
     });
   }
 
-  async getQuotesById(id: string): Promise<Array<Pick<Quote, 'id' | 'text'>>> {
+  async getQuotesById(id: string, language = 'en'): Promise<Array<Pick<Quote, 'id' | 'text'>>> {
     const {quotes} = (await this._filmsRef.doc(id).get()).data() || {};
     if (quotes) {
       return quotes.map(v => {
+        const text = (v.translations || {})[language] || v.text;
         return {
-          text: v.text,
+          text,
           id: v.id
         };
       });
@@ -42,15 +43,16 @@ export default class FirestoreFilms implements IFilms {
     return null;
   }
 
-  async getQuoteMetadataById(filmId: string, quoteId: string): Promise<Quote> {
+  async getQuoteMetadataById(filmId: string, quoteId: string, language= 'en'): Promise<Quote> {
     const res = await this._filmsRef.doc(filmId).get();
     const {quotes} = res.exists ? res.data() : {quotes: []};
-    const quote = quotes.find(v => v.id === quoteId);
+    const quote: FirestoreQuoteModel = quotes.find(v => v.id === quoteId);
     if (quote) {
       const actor = (await this._actorsRef.doc(quote.actorRef).get()).data();
+      const text = (quote.translations || {})[language] || quote.text;
       return {
         id: quote.id,
-        text: quote.text,
+        text,
         actor
       };
     }

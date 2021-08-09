@@ -1,8 +1,13 @@
 type Config = {
-  firestore: FirestoreConnectionOptions
+  firestore: FirestoreConnectionOptions,
+  googlePubSub: GooglePubSubConnectionOptions
 };
 
 export type FirestoreConnectionOptions = {
+  projectId: string
+};
+
+export type GooglePubSubConnectionOptions = {
   projectId: string
 };
 

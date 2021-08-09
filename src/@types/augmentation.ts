@@ -1,6 +1,7 @@
 import IDatastoreConnection from './datastoreConnection';
 import Config from './config';
 import Validator from '../plugins/validator';
+import {TranslationClient} from '../services/pubsub';
 
 declare module 'fastify' {
 
@@ -8,5 +9,6 @@ declare module 'fastify' {
     store: IDatastoreConnection
     config: Config
     validator: Validator
+    translationClient: TranslationClient
   }
 }

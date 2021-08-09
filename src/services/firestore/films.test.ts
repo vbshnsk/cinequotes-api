@@ -5,6 +5,14 @@ describe('Films queries', () => {
     projectId: 'dummy'
   });
 
+  beforeAll(async () => {
+    await store.connect();
+  });
+
+  afterAll(async () => {
+    await store.disconnect();
+  });
+
   afterEach(async () => {
     await store.flush();
   });
@@ -57,6 +65,33 @@ describe('Films queries', () => {
       expect(data).toMatchObject({
         id: 'id',
         text: 'text',
+        actor: {
+          id: 'actorId',
+          name: 'actor'
+        }
+      });
+    });
+
+    it('should return translation when available', async () => {
+      const filmData = {
+        id: 'id',
+        title: 'title',
+        quotes: [{
+          id: 'id',
+          text: 'text',
+          actorRef: 'actorId',
+          translations: {
+            fr: 'translation'
+          }
+        }]
+      };
+      await store.insertAt('films', 'id', filmData);
+      await store.insertAt('actors', 'actorId', {id: 'actorId', name: 'actor'});
+
+      const data = await store.films.getQuoteMetadataById('id', 'id', 'fr');
+      expect(data).toMatchObject({
+        id: 'id',
+        text: 'translation',
         actor: {
           id: 'actorId',
           name: 'actor'

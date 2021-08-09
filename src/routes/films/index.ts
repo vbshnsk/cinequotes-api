@@ -6,10 +6,13 @@ import {Film} from '../../@types/films';
 import Quote from '../../@types/quote';
 
 const plugin = async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
+
   fastify.log.info('Registering /films routes');
   fastify.register(async (fastify, opts) => {
+
     fastify.log.info('Registering /films/:filmId routes');
     fastify.register(async (fastify, opts) => {
+
       fastify.log.info('Registering /films/:filmId prehook');
       fastify.addHook<{
         Params: Pick<FilmRouteBaseParams, 'filmId'>,
@@ -49,6 +52,7 @@ const plugin = async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
     }, async (req, rep) => {
       const {title, actor, quoteText} = req.body;
       const updated = await fastify.store.films.addQuote(title, actor, quoteText);
+      await fastify.translationClient.requestTranslation(quoteText);
       rep.code(201);
       rep.send({
         film: {

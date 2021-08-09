@@ -14,7 +14,7 @@ export type FirestoreFilmModel = {
 
 export default interface IFilms {
   getAllMetadata: () => Promise<Array<Pick<Film, 'id' | 'title'>>>
-  getQuotesById: (id: string) => Promise<Array<Pick<Quote, 'id' | 'text'>>>
-  getQuoteMetadataById: (filmId: string, quoteId: string) => Promise<Quote>
+  getQuotesById: (id: string, language?: string) => Promise<Array<Pick<Quote, 'id' | 'text'>>>
+  getQuoteMetadataById: (filmId: string, quoteId: string, language?: string) => Promise<Quote>
   addQuote: (title: string, actorName: string, quoteText: string) => Promise<FirestoreFilmModel>
 }

@@ -5,5 +5,6 @@ start().then(server => {
     if (err) {
       server.log.error(err);
     }
+    server.log.info('Listening on:', address);
   });
 });

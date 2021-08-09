@@ -1,10 +1,12 @@
 import {FastifyInstance, FastifyPluginOptions} from 'fastify';
 import {getAll, getById} from './schema';
-import {ErrorReply, FilmRouteBaseParams} from '../../../@types/requests';
+import {ErrorReply, FilmRouteBaseParams, GetQuoteQuery} from '../../../@types/requests';
 import Quote from '../../../@types/quote';
 
 const plugin = async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
   fastify.register(async (fastify, opts) => {
+
+    fastify.log.info('Registering /quotes/:quoteId routes');
     fastify.register(async (fastify, opts) => {
       fastify.addHook<{
         Params: Pick<FilmRouteBaseParams, 'quoteId'>,
@@ -22,11 +24,13 @@ const plugin = async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
       fastify.get<{
         Params: FilmRouteBaseParams,
         Reply: ErrorReply | Quote
+        Querystring: GetQuoteQuery
       }>('/', {
         schema: getById
       }, async (req, rep) => {
         const {filmId, quoteId} = req.params;
-        const quote = await fastify.store.films.getQuoteMetadataById(filmId, quoteId);
+        const {language} = req.query;
+        const quote = await fastify.store.films.getQuoteMetadataById(filmId, quoteId, language);
         if (quote) {
           rep.code(200);
           rep.send(quote);
@@ -43,11 +47,13 @@ const plugin = async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
     fastify.get<{
       Params: Pick<FilmRouteBaseParams, 'filmId'>,
       Reply: ErrorReply | Array<Pick<Quote, 'id' | 'text'>>
+      Querystring: GetQuoteQuery
     }>('/', {
       schema: getAll
     }, async (req, rep) => {
       const {filmId} = req.params;
-      const quotes = await fastify.store.films.getQuotesById(filmId);
+      const {language} = req.query;
+      const quotes = await fastify.store.films.getQuotesById(filmId, language);
       if (quotes) {
         rep.code(200);
         rep.send(quotes);

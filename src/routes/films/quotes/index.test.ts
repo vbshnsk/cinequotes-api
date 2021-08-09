@@ -1,5 +1,5 @@
 import {FastifyInstance} from 'fastify';
-import {start} from '../../../server';
+import {startForTests} from '../../../server';
 import * as sinon from 'sinon';
 import {SinonSandbox, SinonStub} from 'sinon';
 
@@ -9,8 +9,8 @@ describe('/quotes', () => {
   let sandbox: SinonSandbox;
 
   beforeAll(async () => {
-    server = await start();
     sandbox = sinon.createSandbox();
+    server = await startForTests();
   });
 
   afterEach(() => {

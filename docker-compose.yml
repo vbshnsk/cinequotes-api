@@ -7,3 +7,9 @@ services:
       dockerfile: firestoreEmulator.Dockerfile
     ports:
       - "8505:8505"
+  pubsub-emulator:
+    build:
+      context: ./
+      dockerfile: pubSubEmulator.Dockerfile
+    ports:
+      - "8085:8085"

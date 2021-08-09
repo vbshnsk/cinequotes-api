@@ -16,3 +16,6 @@ export type ErrorReply = {
   message: string
 };
 
+export type GetQuoteQuery = {
+  language: string
+};

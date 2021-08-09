@@ -7,6 +7,13 @@ export const start = async () => {
   server.register(register);
   await server.ready();
   await server.store.connect();
+  await server.translationClient.start();
+  return server;
+};
+
+export const startForTests = async () => {
+  server.register(register);
+  await server.ready();
   return server;
 };
 
