@@ -23,7 +23,7 @@ export default class FirestoreFilms implements IFilms {
     const {docs} = await this._filmsRef.get();
     return docs.map(v => {
       return {
-        id: v.get('id'),
+        id: v.id,
         title: v.get('title')
       };
     });
@@ -59,7 +59,8 @@ export default class FirestoreFilms implements IFilms {
     return null;
   }
 
-  async addQuote(title: string, actorName: string, quoteText: string): Promise<FirestoreFilmModel> {
+  async addQuote(title: string, actorName: string, quoteText: string):
+    Promise<{updated: FirestoreFilmModel, quoteId: string}> {
     const [actor] = (await this._actorsRef.where('name', '==', actorName).get()).docs;
     let actorId: string;
     if (!actor) {
@@ -102,7 +103,7 @@ export default class FirestoreFilms implements IFilms {
       film.quotes.push(quote);
     }
 
-    return film;
+    return {updated: film, quoteId: quote.id};
   }
 
 }

@@ -12,7 +12,7 @@ describe('Translation pub sub client', () => {
   let reqId: string;
 
   beforeAll(async () => {
-    const conf: Record<string, unknown> = Object.assign({}, config.googlePubSub);
+    const conf = Object.assign({}, config.googlePubSub);
     const [pubSubHost, pubSubPort] = process.env.PUBSUB_EMULATOR_HOST.split(':');
     conf.servicePath = pubSubHost;
     conf.port = pubSubPort;
@@ -33,7 +33,7 @@ describe('Translation pub sub client', () => {
   });
 
   it('should send translation request', async () => {
-    reqId = await client.requestTranslation('translate');
+    reqId = await client.requestTranslation('id', 'id', 'translate');
     expect(con.requestsInProgress[reqId]).toBeDefined();
   });
 

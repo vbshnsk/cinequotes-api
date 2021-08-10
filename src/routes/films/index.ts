@@ -51,8 +51,8 @@ const plugin = async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
       schema: updateFilm
     }, async (req, rep) => {
       const {title, actor, quoteText} = req.body;
-      const updated = await fastify.store.films.addQuote(title, actor, quoteText);
-      await fastify.translationClient.requestTranslation(quoteText);
+      const {updated, quoteId} = await fastify.store.films.addQuote(title, actor, quoteText);
+      await fastify.translationClient.requestTranslation(updated.id, quoteId, quoteText);
       rep.code(201);
       rep.send({
         film: {

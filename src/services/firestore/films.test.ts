@@ -158,9 +158,9 @@ describe('Films queries', () => {
       await store.insertAt('films', 'id', filmData);
       await store.insertAt('actors', 'id', {id: 'actorId', name: 'actor'});
 
-      const res = await store.films.addQuote('title', 'actor', 'new quote');
+      const {updated} = await store.films.addQuote('title', 'actor', 'new quote');
 
-      expect(res).toMatchObject({
+      expect(updated).toMatchObject({
         id: 'id',
         title: 'title',
         quotes: [{
@@ -172,9 +172,9 @@ describe('Films queries', () => {
     it('should add quote with not existing film', async () => {
       await store.insertAt('actors', 'id', {id: 'actorId', name: 'actor'});
 
-      const res = await store.films.addQuote('title', 'actor', 'new quote');
+      const {updated} = await store.films.addQuote('title', 'actor', 'new quote');
 
-      expect(res).toMatchObject({
+      expect(updated).toMatchObject({
         title: 'title',
         quotes: [{
           text: 'new quote'
@@ -183,16 +183,16 @@ describe('Films queries', () => {
     });
 
     it('should add quote with not existing actor', async () => {
-      const res = await store.films.addQuote('title', 'actor', 'new quote');
+      const {updated} = await store.films.addQuote('title', 'actor', 'new quote');
 
-      expect(res).toMatchObject({
+      expect(updated).toMatchObject({
         title: 'title',
         quotes: [{
           text: 'new quote'
         }]
       });
 
-      const quote = await store.films.getQuoteMetadataById(res.id, res.quotes[0].id);
+      const quote = await store.films.getQuoteMetadataById(updated.id, updated.quotes[0].id);
       expect(quote.actor).toMatchObject({name: 'actor'});
     });
 

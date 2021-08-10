@@ -77,13 +77,16 @@ describe('/films', () => {
         .resolves();
       sandbox.stub(server.store.films, 'addQuote')
         .resolves({
-          id: 'id',
-          title: 'title',
-          quotes: [{
+          updated: {
             id: 'id',
-            text: 'text',
-            actorRef: 'actorId'
-          }]
+            title: 'title',
+            quotes: [{
+              id: 'id',
+              text: 'text',
+              actorRef: 'actorId'
+            }]
+          },
+          quoteId: 'id'
         });
 
       const res = await server.inject({

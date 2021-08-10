@@ -15,8 +15,11 @@ export default class TranslationClient {
     await this._connection.stop();
   }
 
-  requestTranslation(text) {
+  requestTranslation(filmId: string, quoteId: string, text: string) {
     return this._connection.publish({
+      requestType: 'setTranslation',
+      filmId,
+      quoteId,
       text
     });
   }

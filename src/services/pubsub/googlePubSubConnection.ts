@@ -1,17 +1,18 @@
-import {PubSub, Subscription, Topic} from '@google-cloud/pubsub';
+import {Message, PubSub, Subscription, Topic} from '@google-cloud/pubsub';
 import * as uuid from 'uuid';
 import IPubSubConnection, {PubSubRequest} from '../../@types/pubSubConnection';
 
 export default class GooglePubSubConnection implements IPubSubConnection {
   private _pubSub: PubSub;
   private _topic: Topic;
-  private _responseSubscription: Subscription;
-  private _requests: Record<string, PubSubRequest>;
+  private _requestSubscription: Subscription;
+  private readonly _requests: Record<string, PubSubRequest>;
 
   constructor(pubSub: PubSub, topic: string) {
     this._pubSub = pubSub;
     this._topic = this._pubSub.topic(topic);
-    this._responseSubscription = this._topic.subscription('response');
+    this._requestSubscription = this._topic.subscription('request');
+    this._requests = {};
   }
 
   get requestsInProgress() {
@@ -23,22 +24,21 @@ export default class GooglePubSubConnection implements IPubSubConnection {
       await this._topic.create();
     }
 
-    if (!(await this._responseSubscription.exists())[0]) {
-      await this._responseSubscription.create();
+    if (!(await this._requestSubscription.exists())[0]) {
+      await this._requestSubscription.create();
     }
 
-    this._responseSubscription.on('message', this._onMessage.bind(this));
+    this._requestSubscription.on('message', this._onMessage.bind(this));
   }
 
   async stop() {
-    await this._responseSubscription.delete();
+    await this._requestSubscription.delete();
   }
 
   async publish(data: Record<string, unknown>) {
     const requestId = uuid.v4();
     data.requestId = requestId;
 
-    this._requests = this._requests || {};
     this._requests[requestId] = {
       timestamp: Date.now()
     };
@@ -47,8 +47,9 @@ export default class GooglePubSubConnection implements IPubSubConnection {
     return requestId;
   }
 
-  _onMessage(message: Buffer) {
-    this.onMessage(message.toString());
+  private _onMessage(message: Message) {
+    this.onMessage(message.data.toString());
+    message.ack();
   }
 
   onMessage(message: string) {

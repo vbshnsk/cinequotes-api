@@ -1,9 +1,11 @@
 import register from './register';
 import fastify from 'fastify';
+import * as dotenv from 'dotenv';
 
 const server = fastify({logger: true});
 
 export const start = async () => {
+  dotenv.config();
   server.register(register);
   await server.ready();
   await server.store.connect();
